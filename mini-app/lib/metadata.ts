@@ -1,3 +1,3 @@
-export const title = "Mini App Factory App";
-export const description = "This app was created by the Mini App Factory!";
+export const title = "Football Quiz App";
+export const description = "Test your knowledge of football with true/false questions.";
 export const url = process.env.NEXT_PUBLIC_URL;
