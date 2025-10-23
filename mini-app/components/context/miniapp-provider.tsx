@@ -23,21 +23,22 @@ export function MiniAppProvider({ children }: { children: React.ReactNode }) {
     const ready = async () => {
       await Promise.all([
         sdk.context
-          .then((context) =>
-            setContext((oldContext) => {
-              return { ...oldContext, context };
-            })
+          .then((ctx) =>
+            setContext((oldContext) => ({
+              ...oldContext,
+              context: ctx,
+            }))
           )
           .catch(console.error),
         sdk
           .isInMiniApp()
           .then((isInMiniApp) =>
-            setContext((oldContext) => {
-              return { ...oldContext, isInMiniApp };
-            })
+            setContext((oldContext) => ({
+              ...oldContext,
+              isInMiniApp,
+            }))
           )
           .catch(console.error),
-        ,
       ]);
 
       await sdk.actions.ready().catch(console.error);

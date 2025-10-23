@@ -1,19 +1,22 @@
-import { useRouter, useSearchParams } from "next/navigation";
+"use client";
+
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function QuestionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const questionId = parseInt(searchParams.get("id") ?? "1");
+  const { questionId } = useParams();
+  const questionIdNum = parseInt(questionId ?? "1");
   const score = parseInt(searchParams.get("score") ?? "0");
   const [question, setQuestion] = useState<{ text: string; correct: boolean } | null>(null);
   const [timeLeft, setTimeLeft] = useState(10);
 
   useEffect(() => {
-    fetch(`/api/generate-quiz?questionId=${questionId}`)
+    fetch(`/api/generate-quiz?questionId=${questionIdNum}`)
       .then((res) => res.json())
       .then(setQuestion);
-  }, [questionId]);
+  }, [questionIdNum]);
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -28,12 +31,12 @@ export default function QuestionPage() {
     fetch("/api/submit-answer", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ questionId, answer }),
+      body: JSON.stringify({ questionId: questionIdNum, answer }),
     })
       .then((res) => res.json())
       .then((data) => {
         const newScore = data.correct ? score + 1 : score;
-        const nextId = questionId + 1;
+        const nextId = questionIdNum + 1;
         if (nextId > 10) {
           router.push(`/quiz/result?score=${newScore}`);
         } else {
