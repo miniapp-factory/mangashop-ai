@@ -7,25 +7,12 @@ export default function QuestionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { questionId } = useParams();
-  const questionIdNum = parseInt(questionId ?? "1");
+  const questionIdNum = parseInt(
+    Array.isArray(questionId) ? questionId[0] : questionId ?? "1"
+  );
   const score = parseInt(searchParams.get("score") ?? "0");
   const [question, setQuestion] = useState<{ text: string; correct: boolean } | null>(null);
   const [timeLeft, setTimeLeft] = useState(10);
-
-  useEffect(() => {
-    fetch(`/api/generate-quiz?questionId=${questionIdNum}`)
-      .then((res) => res.json())
-      .then(setQuestion);
-  }, [questionIdNum]);
-
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      handleAnswer(false);
-      return;
-    }
-    const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [timeLeft]);
 
   const handleAnswer = (answer: boolean) => {
     fetch("/api/submit-answer", {
@@ -44,6 +31,21 @@ export default function QuestionPage() {
         }
       });
   };
+
+  useEffect(() => {
+    fetch(`/api/generate-quiz?questionId=${questionIdNum}`)
+      .then((res) => res.json())
+      .then(setQuestion);
+  }, [questionIdNum]);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      handleAnswer(false);
+      return;
+    }
+    const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [timeLeft, handleAnswer]);
 
   if (!question) return <p>Loading...</p>;
 
